@@ -176,9 +176,9 @@
 
 
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { useAuth } from "../context/AuthContext";
+import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db } from '../firebase/config';
 
 {/* -------<<< Todo Section >>>------- */}
@@ -187,39 +187,36 @@ function Dashboard() {
 
     const navigation = useNavigate()
     const { currentUser } = useAuth()
-    const [todos, settodos] = useState([]);
     const { logout } = useAuth()
     
-    // const [users, setUsers] = useState([]);
-    let [newTodo, setNewTodo] = useState("")
-    let [editId, setEditId] = useState("")
-    let [searchInp, setsearchInp] = useState("")
+    const [todos, settodos] = useState([]);
+    const [newTodo, setNewTodo] = useState("")
+    const [editId, setEditId] = useState("")
+    const [searchInp, setsearchInp] = useState("")
 
     // ============= Get Todos ==============
 
     useEffect(() => {
         if (!currentUser) return;
 
-        async function fetchTodos() {
+        const qry = query(
+            collection(db , "todos"),
+            where("uid" , "==" , currentUser.uid),
+            // orderBy("createdAt", "desc")
+        )
 
-            const qry = query(
-                collection(db , "todos"),
-                where("id" , "==" , currentUser.uid)
-            )
+        const unsubscribe = onSnapshot(qry , (snapshot) => {
 
-            const res = await getDocs(qry);
-
-            const dataArr = res.docs.map((doc) => (
+            const dataArr = snapshot.docs.map((doc) => (
                 {
-                    id: doc.id,
+                    u: doc.id,
                     ...doc.data()
                 }
             ))
             settodos(dataArr);
 
-        }
-
-        fetchTodos();
+        })
+        return () => unsubscribe();
 
     } , [currentUser])
 
@@ -231,11 +228,10 @@ function Dashboard() {
         try {
             await addDoc(collection(db, 'todos'), {
                 text: newTodo,
-                id: currentUser.uid,
+                uid: currentUser.uid,
                 createdAt: new Date()
             })
             setNewTodo("");
-            alert("Todo Add Successfully")
         }
         catch (error) {
             console.error('Error adding transaction:', error.message);
@@ -255,14 +251,15 @@ function Dashboard() {
 
     // ============= Delete Todos ==============
 
-    // async function handleDeleteTransaction(id) {
-    //     try {
-            
-    //     } catch (error) {
-            
-    //     }
-    // }
+    async function handleDeleteTransaction(id) {
 
+        try {
+            await deleteDoc(doc(db , "todos" , id))
+        } catch (error) {
+            console.error('Error deleting transaction:', error);
+        }
+
+    }
 
     // ============= Handle Logout ==============
 
@@ -313,74 +310,74 @@ function Dashboard() {
             <section className="flex flex-col items-center flex-grow justify-center">
                 <div className="w-[90%] space-y-6 max-w-lg bg-white shadow-lg transition-all duration-300 rounded-2xl p-8 border border-gray-200">
 
-                {/* Title */}
-                <h2 className="text-[24px] font-bold space-x-2 text-center text-gray-800 tracking-wide">
-                    
-                    <i className="fa-solid fa-list-check"></i>
-                    Your <span className="text-blue-600">Tasks</span>
-                    
-                </h2>
+                    {/* Title */}
+                    <h2 className="text-[24px] font-bold space-x-2 text-center text-gray-800 tracking-wide">
+                        
+                        <i className="fa-solid fa-list-check"></i>
+                        Your <span className="text-blue-600">Tasks</span>
+                        
+                    </h2>
 
-                {/* Search bar */}
-                <div className="flex items-center gap-2 ">
+                    {/* Search bar */}
+                    <div className="flex items-center gap-2 ">
 
-                    <input type="text" placeholder="Search Todos..." value={searchInp} onChange={(e) => setsearchInp(e.target.value)}
-                    className="text-[15px] font-medium w-full border border-gray-300 rounded-lg px-4 py-2.5 ring-1 ring-gray-300 ring-offset-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1.5 transition-all duration-500"/>
-                    <button className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-all ease-in-out duration-500 hover:cursor-pointer hover:scale-95">
-                    <i className="fa-solid fa-magnifying-glass"></i>
-                    </button>
-
-                </div>
-
-                <ul className="space-y-3">
-
-                    {todos.length > 0 ? (
-
-                        todos.map((todo , i) => (
-                        <li key={`${todo.id} - ${i}`}
-                            className="flex justify-between items-center bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:shadow-md transition-all hover:cursor-pointer">
-                            <span className="text-gray-800 font-medium">{todo.text}</span>
-
-                            <div className="space-x-2">
-
-                                <button onClick={() => editTodo(todo.id)}
-                                    className="text-[18px] text-blue-700 duration-400 hover:cursor-pointer">
-                                    <i className="fa-regular fa-pen-to-square"></i>
-                                </button>
-
-                                <button onClick={() => delTodo(todo.id)}
-                                    className="text-[18px] text-blue-700 duration-400 hover:text-red-600 hover:cursor-pointer">
-                                    <i className="fa-solid fa-trash"></i>
-                                </button>
-
-                            </div>
-                        </li>
-                        ))
-
-                    ) : (
-
-                        <li className="text-gray-500 text-center bg-gray-50 border border-gray-200 rounded-lg py-3">
-                        No todos found...
-                        </li>
-
-                    )}
-
-                </ul>
-
-
-                {/* Add new task */}
-                <div className="">
-
-                    <p className="text-gray-600 mb-2 text-sm">Add a new todo...</p>
-                    <div className="flex gap-2">
-                        <input type="text" placeholder="Enter a task" value={newTodo} onChange={(e) => setNewTodo(e.target.value)}
+                        <input type="text" placeholder="Search Todos..." value={searchInp} onChange={(e) => setsearchInp(e.target.value)}
                         className="text-[15px] font-medium w-full border border-gray-300 rounded-lg px-4 py-2.5 ring-1 ring-gray-300 ring-offset-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1.5 transition-all duration-500"/>
-                        <button onClick={handleAddTransaction} className="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all ease-in-out duration-500 hover:cursor-pointer hover:scale-95">
-                            {editId ? "Update" : "Add"}
+                        <button className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-all ease-in-out duration-500 hover:cursor-pointer hover:scale-95">
+                        <i className="fa-solid fa-magnifying-glass"></i>
                         </button>
+
                     </div>
 
-                </div>
+                    {/* Todos */}
+                    <ul className="space-y-3">
+
+                        {todos.length > 0 ? (
+
+                            todos.map((todo , i) => (
+                            <li key={`${todo.id} - ${i}`}
+                                className="flex justify-between items-center bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:shadow-md transition-all hover:cursor-pointer">
+                                <span className="text-gray-800 font-medium">{todo.text}</span>
+
+                                <div className="space-x-2">
+
+                                    <button onClick={() => editTodo(todo.id)}
+                                        className="text-[18px] text-blue-700 duration-400 hover:cursor-pointer">
+                                        <i className="fa-regular fa-pen-to-square"></i>
+                                    </button>
+
+                                    <button onClick={() => handleDeleteTransaction(todo.id)}
+                                        className="text-[18px] text-blue-700 duration-400 hover:text-red-600 hover:cursor-pointer">
+                                        <i className="fa-solid fa-trash"></i>
+                                    </button>
+
+                                </div>
+                            </li>
+                            ))
+
+                        ) : (
+
+                            <li className="text-gray-500 text-center bg-gray-50 border border-gray-200 rounded-lg py-3">
+                            No todos found...
+                            </li>
+
+                        )}
+
+                    </ul>
+
+                    {/* Add new task */}
+                    <div className="">
+
+                        <p className="text-gray-600 mb-2 text-sm">Add a new todo...</p>
+                        <div className="flex gap-2">
+                            <input type="text" placeholder="Enter a task" value={newTodo} onChange={(e) => setNewTodo(e.target.value)}
+                            className="text-[15px] font-medium w-full border border-gray-300 rounded-lg px-4 py-2.5 ring-1 ring-gray-300 ring-offset-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1.5 transition-all duration-500"/>
+                            <button onClick={handleAddTransaction} className="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all ease-in-out duration-500 hover:cursor-pointer hover:scale-95">
+                                {editId ? "Update" : "Add"}
+                            </button>
+                        </div>
+
+                    </div>
                 
                 </div>
             </section>
