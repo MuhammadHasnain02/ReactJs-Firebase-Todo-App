@@ -1,184 +1,7 @@
-
-// function Dashboard() {
-
-
-//     let [todos , setTodos] = useState([])
-//     let [newTodo, setNewTodo] = useState("")
-//     let [editId, setEditId] = useState("")
-//     let [searchInp, setsearchInp] = useState("")
-
-//     // Handling Add Todos
-//     function addTodo() {
-//         if (newTodo.trim === "") return
-
-//         if (editId) {
-//             let updatedTodos = todos.map( todo => todo.id === editId ? {...todo , task : newTodo} : todo )
-//             setTodos(updatedTodos)
-//             setEditId(null)
-//         }
-//         else {
-//             setTodos([...todos, { id: Date.now(), task: newTodo }]);
-//         }
-
-//         setNewTodo("");
-
-//     }
-
-//     // Handling Edit Todos
-//     function editTodo(id) {
-
-//         setEditId(id)
-//         let todo = todos.find((todo) => todo.id === id)
-//         setNewTodo(todo.task)
-
-//     }
-
-//     // Handling Delete Todos
-//     function delTodo(id) {
-//         setTodos( todos.filter(todo => todo.id != id) )
-//     }
-
-//     // Handling Search Todos
-//     function searchTodo() {
-//         return todos.filter(todo => todo.task.toLowerCase().includes(searchInp.toLowerCase()))
-//     }
-
-//     const filteredTodos = searchTodo();
-
-//     useEffect(() => {
-
-//         const getData = async () => {
-
-//             const res = await getDocs(collection(db, "todos"));
-//             console.log(res);
-//             const dataArr = res.docs.map((doc) => (
-//                 {
-//                     id: doc.id,
-//                     ...doc.data()
-//                 }
-//             ))
-
-//             setUsers(dataArr);
-
-//         }
-//         getData();
-
-//     } , [])
-
-//     async function handleLogout() {
-//         try {
-//             await logout()
-//             navigation('/');
-//         } catch (error) {
-//             console.log('Error logging out: ' + error.message);
-//         }
-//     }
-
-//     return (
-// <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4 relative">
-
-//   {/* Logout Button - fixed top-right */}
-//   <button
-//     onClick={handleLogout}
-//     className="absolute top-4 right-4 bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition-all duration-300 shadow-md"
-//   >
-//     Logout
-//   </button>
-
-//   {/* Header */}
-//   <header className="text-center mb-8">
-//     <h1 className="text-3xl font-bold text-gray-800">Firebase</h1>
-//     <p className="text-xl text-gray-600 mt-1">Todo Application</p>
-//     <p className="text-gray-500 font-medium mt-1">( {currentUser.email} )</p>
-//   </header>
-
-//   {/* Todo Card */}
-//   <section className="w-full max-w-lg bg-white shadow-2xl rounded-2xl p-8 border border-gray-200 transition-all duration-300">
-
-//     {/* Title */}
-//     <h2 className="text-2xl font-bold text-center text-gray-800 mb-6 tracking-wide flex justify-center items-center gap-2">
-//       <i className="fa-solid fa-list-check text-blue-600"></i>
-//       Your <span className="text-blue-600">Tasks</span>
-//     </h2>
-
-//     {/* Search Bar */}
-//     <div className="flex gap-2 mb-6">
-//       <input
-//         type="text"
-//         placeholder="Search Todos..."
-//         value={searchInp}
-//         onChange={(e) => setsearchInp(e.target.value)}
-//         className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-gray-700 placeholder-gray-400"
-//       />
-//       <button className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300">
-//         <i className="fa-solid fa-magnifying-glass"></i>
-//       </button>
-//     </div>
-
-//     {/* Todo List */}
-//     <ul className="space-y-3 mb-6 max-h-96 overflow-y-auto">
-//       {filteredTodos.length > 0 ? (
-//         filteredTodos.map((todo) => (
-//           <li
-//             key={todo.id}
-//             className="flex justify-between items-center bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:shadow-md transition-all duration-300"
-//           >
-//             <span className="text-gray-800 font-medium">{todo.task}</span>
-//             <div className="flex gap-2">
-//               <button
-//                 onClick={() => editTodo(todo.id)}
-//                 className="text-blue-600 hover:text-blue-800 transition duration-300"
-//               >
-//                 <i className="fa-regular fa-pen-to-square text-lg"></i>
-//               </button>
-//               <button
-//                 onClick={() => delTodo(todo.id)}
-//                 className="text-red-500 hover:text-red-700 transition duration-300"
-//               >
-//                 <i className="fa-solid fa-trash text-lg"></i>
-//               </button>
-//             </div>
-//           </li>
-//         ))
-//       ) : (
-//         <li className="text-gray-500 text-center bg-gray-50 border border-gray-200 rounded-lg py-3">
-//           No todos found...
-//         </li>
-//       )}
-//     </ul>
-
-//     {/* Add / Edit Todo */}
-//     <div>
-//       <p className="text-gray-600 mb-2 text-sm">Add a new todo...</p>
-//       <div className="flex gap-2">
-//         <input
-//           type="text"
-//           placeholder="Enter a task"
-//           value={newTodo}
-//           onChange={(e) => setNewTodo(e.target.value)}
-//           className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-gray-700 placeholder-gray-400"
-//         />
-//         <button
-//           onClick={addTodo}
-//           className="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300"
-//         >
-//           {editId ? "Update" : "Add"}
-//         </button>
-//       </div>
-//     </div>
-
-//   </section>
-// </div>
-
-
-//     )
-// }
-
-
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { db } from '../firebase/config';
 
 {/* -------<<< Todo Section >>>------- */}
@@ -209,7 +32,7 @@ function Dashboard() {
 
             const dataArr = snapshot.docs.map((doc) => (
                 {
-                    u: doc.id,
+                    id: doc.id,
                     ...doc.data()
                 }
             ))
@@ -222,7 +45,7 @@ function Dashboard() {
 
     // ============= Add Todos ==============
 
-    async function handleAddTransaction() {
+    async function handleAddTodo() {
         if (!newTodo.trim()) return;
 
         try {
@@ -241,17 +64,30 @@ function Dashboard() {
 
     // ============= Edit Todos ==============
 
-    // async function handleEditTransaction(transaction) {
-    //     try {
+    function editTodo(todo) {
+        setNewTodo(todo.text);
+        setEditId(todo.id);
+    }
+
+    async function handleUpdateTodo() {
+        if (!newTodo.trim() || !editId) return;
+
+        try {
+            await updateDoc(doc(db , "todos" , editId) , {
+                text:newTodo
+            })
             
-    //     } catch (error) {
-            
-    //     }
-    // }
+            setNewTodo("");
+            setEditId("");
+        }
+        catch (error) {
+            console.error("Error updating todo:", error);
+        }
+    }
 
     // ============= Delete Todos ==============
 
-    async function handleDeleteTransaction(id) {
+    async function handleDeleteTodo(id) {
 
         try {
             await deleteDoc(doc(db , "todos" , id))
@@ -341,12 +177,12 @@ function Dashboard() {
 
                                 <div className="space-x-2">
 
-                                    <button onClick={() => editTodo(todo.id)}
+                                    <button onClick={() => editTodo(todo)}
                                         className="text-[18px] text-blue-700 duration-400 hover:cursor-pointer">
                                         <i className="fa-regular fa-pen-to-square"></i>
                                     </button>
 
-                                    <button onClick={() => handleDeleteTransaction(todo.id)}
+                                    <button onClick={() => handleDeleteTodo(todo.id)}
                                         className="text-[18px] text-blue-700 duration-400 hover:text-red-600 hover:cursor-pointer">
                                         <i className="fa-solid fa-trash"></i>
                                     </button>
@@ -370,11 +206,14 @@ function Dashboard() {
 
                         <p className="text-gray-600 mb-2 text-sm">Add a new todo...</p>
                         <div className="flex gap-2">
+
                             <input type="text" placeholder="Enter a task" value={newTodo} onChange={(e) => setNewTodo(e.target.value)}
                             className="text-[15px] font-medium w-full border border-gray-300 rounded-lg px-4 py-2.5 ring-1 ring-gray-300 ring-offset-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1.5 transition-all duration-500"/>
-                            <button onClick={handleAddTransaction} className="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all ease-in-out duration-500 hover:cursor-pointer hover:scale-95">
+                            <button onClick={editId ? handleUpdateTodo : handleAddTodo}
+                            className="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all ease-in-out duration-500 hover:cursor-pointer hover:scale-95">
                                 {editId ? "Update" : "Add"}
                             </button>
+
                         </div>
 
                     </div>
