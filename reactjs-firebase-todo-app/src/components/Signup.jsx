@@ -18,8 +18,14 @@ function Signup() {
         }
 
         try {
+
             await signup(email , password)
             alert("Successfully Signed Up!")
+            navigation('/signin');
+            setEmail('')
+            setPassword('')
+            setConfirmPassw('')
+
         } catch (error) {
             console.log('Failed to create account: ' + error.message);
             alert("Something went wrong")

@@ -20,9 +20,13 @@ function Signin() {
         }
 
         try {
+
             await login(email , password)
             alert("Successfully Loged In!")
             navigation('/dashboard');
+            setEmail('')
+            setPassword('')
+
         } catch (error) {
             console.log('Failed to create account: ' + error.message);
             alert('Something went wrong')
