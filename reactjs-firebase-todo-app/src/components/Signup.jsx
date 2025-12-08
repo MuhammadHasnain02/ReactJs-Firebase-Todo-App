@@ -21,7 +21,7 @@ function Signup() {
 
             await signup(email , password)
             alert("Successfully Signed Up!")
-            navigation('/signin');
+            navigation('/dashboard');
             setEmail('')
             setPassword('')
             setConfirmPassw('')
