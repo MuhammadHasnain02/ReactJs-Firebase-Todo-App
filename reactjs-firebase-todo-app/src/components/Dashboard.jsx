@@ -124,7 +124,7 @@ function Dashboard() {
                 <div className="flex items-center gap-3">
 
                     <div className="w-16">
-                        <img src="./logo.png" alt="" />
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTy1eDovRF0hLYHH1QG9iakiuxcmINKCIklew&s" alt="" />
                     </div>
                     <div>
                         <h1 className="text-[26px] font-semibold text-gray-800">Todo<span className="text-blue-600">App</span></h1>

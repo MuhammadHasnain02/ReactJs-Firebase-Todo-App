@@ -9,7 +9,7 @@ function Home() {
             <div className="flex flex-row items-center">
 
                 <div className="">
-                    <img src="../public/logo.png" className="w-22 h-22" />
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTy1eDovRF0hLYHH1QG9iakiuxcmINKCIklew&s" className="w-22 h-22" />
                 </div>
                 <div>
                     <h1 className="text-gray-600 font-bold text-4xl">Firbase</h1>
