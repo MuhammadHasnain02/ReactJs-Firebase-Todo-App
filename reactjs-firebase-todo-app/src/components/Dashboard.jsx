@@ -97,6 +97,12 @@ function Dashboard() {
 
     }
 
+    // ============= Get Todos ==============
+
+    const filteredTodos = todos.filter((todo) => {
+        return todo.text.toLowerCase().includes(searchInp.toLowerCase())
+    })
+
     // ============= Handle Logout ==============
 
     async function handleLogout() {
@@ -107,7 +113,7 @@ function Dashboard() {
             console.log('Error logging out: ' + error.message);
         }
     }
-
+ 
     return (
         <div className="flex flex-col h-screen justify-between">
             
@@ -168,9 +174,9 @@ function Dashboard() {
                     {/* Todos */}
                     <ul className="space-y-3">
 
-                        {todos.length > 0 ? (
+                        {filteredTodos.length > 0 ? (
 
-                            todos.map((todo , i) => (
+                            filteredTodos.map((todo , i) => (
                             <li key={`${todo.id} - ${i}`}
                                 className="flex justify-between items-center bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:shadow-md transition-all hover:cursor-pointer">
                                 <span className="text-gray-800 font-medium">{todo.text}</span>
